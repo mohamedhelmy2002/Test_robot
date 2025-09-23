@@ -8,6 +8,13 @@ from launch.actions import DeclareLaunchArgument
 from launch_ros.actions import Node
 
 import xacro
+import os
+
+from ament_index_python.packages import get_package_share_directory
+
+
+from launch.actions import IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 
 def generate_launch_description():
@@ -51,5 +58,21 @@ def generate_launch_description():
             executable='rviz2',
             #arguments=['-d', os.path.join(pkg_path, 'rviz', 'robot.rviz')],
             output='screen'
-        )
+        ),       
+         # 2. Launch Gazebo (empty world)
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                os.path.join(
+                    get_package_share_directory('gazebo_ros'),
+                    'launch',
+                    'gazebo.launch.py'
+                )
+            ),
+        ),
+        # 3. Spawn your robot into Gazebo
+        Node(package='gazebo_ros', executable='spawn_entity.py',
+                        arguments=['-topic', 'robot_description',
+                                   '-entity', 'robot'],
+                        output='screen')
+
     ])

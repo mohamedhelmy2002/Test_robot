@@ -29,11 +29,13 @@ def generate_launch_description():
                     'gazebo.launch.py'
                 )
             ),
+            # you can add world/verbose args here
+            # launch_arguments={'world': '/path/to/world.sdf', 'verbose':'true'}.items()
         ),
         # 3. Spawn your robot into Gazebo
         Node(package='gazebo_ros', executable='spawn_entity.py',
                         arguments=['-topic', 'robot_description',
                                    '-entity', 'robot'],
                         output='screen')
-
+                        
     ])
