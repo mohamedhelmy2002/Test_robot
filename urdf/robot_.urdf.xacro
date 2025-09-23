@@ -19,9 +19,23 @@
 
     <!-- include all the contents of example_include.xacro first. Go check it out! -->
     <xacro:include filename="example_include.xacro" />
-    <!--
-    <xacro:include filename="example_gazebo.xacro" />
-    -->
+    
+    <!-- edit and add base link ... this can handel from solidworks instead of here -->
+  
+  <link name="base">
+  </link>
+
+  <joint
+    name="base_joint"
+    type="fixed">
+    <origin
+      xyz="0.18435 0 -9.1429E-05"
+      rpy="0 0 0" />
+    <parent
+      link="base" />
+    <child
+      link="base_link" />
+  </joint>
 
 
   <link
