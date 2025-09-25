@@ -12,28 +12,30 @@ from launch_ros.actions import Node
 def generate_launch_description():
     pkg_path = get_package_share_directory('test_robot')
 
-    return LaunchDescription([
-        # 1. Launch RViz/display.launch.py with use_sim_time true
-        IncludeLaunchDescription(
+    launch_display = IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 os.path.join(pkg_path, 'launch', 'display.launch.py')
             ),
             launch_arguments={'use_sim_time': 'true'}.items() 
-        ),
-         # 2. Launch Gazebo (empty world)
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(
-                os.path.join(
-                    get_package_share_directory('gazebo_ros'),
-                    'launch',
-                    'gazebo.launch.py'
-                )
-            ),
-        ),
-        # 3. Spawn your robot into Gazebo
-        Node(package='gazebo_ros', executable='spawn_entity.py',
-                        arguments=['-topic', 'robot_description',
-                                   '-entity', 'robot'],
-                        output='screen')
+        )
+    # Spawn the robot in Gazebo — let’s use the param instead of topic
+    spawn_robot = Node(
+        package='gazebo_ros', executable='spawn_entity.py',
+        arguments=['-entity', 'robot', '-topic', 'robot_description'],
+        output='screen'
+    )
 
+    # Start Gazebo with ROS interface
+    gazebo = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('gazebo_ros'),
+                         'launch', 'gazebo.launch.py')
+        ),
+        launch_arguments={'verbose': 'true'}.items()
+    )
+
+    return LaunchDescription([
+        launch_display,
+        spawn_robot,
+        gazebo
     ])

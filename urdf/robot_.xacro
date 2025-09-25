@@ -20,23 +20,6 @@
     <!-- include all the contents of example_include.xacro first. Go check it out! -->
     <xacro:include filename="example_include.xacro" />
     
-    <!-- edit and add base link ... this can handel from solidworks instead of here -->
-  
-  <link name="base">
-  </link>
-
-  <joint
-    name="base_joint"
-    type="fixed">
-    <origin
-      xyz="0.18435 0 -9.1429E-05"
-      rpy="0 0 0" />
-    <parent
-      link="base" />
-    <child
-      link="base_link" />
-  </joint>
-
 
   <link
     name="base_link">
@@ -60,7 +43,7 @@
     <!-- make better inertia -->
     <xacro:inertial_box mass="10" x="${base_length}" y="${base_width}" z="${base_high}">
       <origin
-        xyz="0 0 0"
+        xyz="0 0 0" 
         rpy="0 0 0" />
     </xacro:inertial_box>
 
@@ -338,7 +321,7 @@
         <mesh
           filename="file://$(find test_robot)/meshes/wc.STL" />
         -->
-        <cylinder radius="0.05" length ="0.024" />
+        <cylinder radius="0.025" length ="0.024" />
       </geometry>
     </collision>
   </link>

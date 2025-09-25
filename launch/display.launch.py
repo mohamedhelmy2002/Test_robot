@@ -1,55 +1,46 @@
-import os
-
-from ament_index_python.packages import get_package_share_directory
-
 from launch import LaunchDescription
-from launch.substitutions import LaunchConfiguration
 from launch.actions import DeclareLaunchArgument
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
-
-import xacro
+from ament_index_python.packages import get_package_share_directory
+import xacro, os
 
 
 def generate_launch_description():
-    # Declare 'use_sim_time' so you can override at launch
+    # Use sim time by default
     use_sim_time = LaunchConfiguration('use_sim_time')
 
-    # Get the path to your package's share directory
-    pkg_path = get_package_share_directory('test_robot')  # <-- your package name
-    xacro_file = os.path.join(pkg_path, 'urdf', 'robot_.urdf.xacro')
+    # Path to your package and xacro file
+    pkg_path = get_package_share_directory('test_robot')
+    xacro_file = os.path.join(pkg_path, 'urdf', 'robot_.xacro')
+    robot_description = xacro.process_file(xacro_file).toxml()
+    
 
-    # Process the Xacro file into URDF XML
-    robot_description_config = xacro.process_file(xacro_file)
-    robot_description = robot_description_config.toxml()
+    # Publish robot_description param + tf
+    robot_state_publisher = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        parameters=[{
+            'robot_description': robot_description,
+            'use_sim_time': use_sim_time
+        }],
+        output='screen'
+    )
+    
 
-    # Launch description
+    # RViz with sim time
+    rviz = Node(
+        package='rviz2',
+        executable='rviz2',
+        #parameters=[{'use_sim_time': use_sim_time}],
+        output='screen'
+    )
+
     return LaunchDescription([
-        DeclareLaunchArgument(
-            'use_sim_time',
-            default_value='true',
-            description='Use simulation (Gazebo) clock if true'
-        ),
-         # Robot State Publisher node
-        Node(
-            package='robot_state_publisher',
-            executable='robot_state_publisher',
-            parameters=[{
-                'robot_description': robot_description,
-                'use_sim_time': use_sim_time
-            }],
-            output='screen'
-        ),
-        # Joint State Publisher GUI node
-        Node(
-            package='joint_state_publisher_gui',
-            executable='joint_state_publisher_gui',
-            output='screen'
-        ),
-        # RViz2 node
-        Node(
-            package='rviz2',
-            executable='rviz2',
-            #arguments=['-d', os.path.join(pkg_path, 'rviz', 'robot.rviz')],
-            output='screen'
-        )
+        DeclareLaunchArgument('use_sim_time', default_value='false'),
+        #joint_state_gui,
+        robot_state_publisher,
+        rviz,
+
+        
     ])

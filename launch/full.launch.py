@@ -14,9 +14,9 @@ def generate_launch_description():
 
     # Path to your package and xacro file
     pkg_path = get_package_share_directory('test_robot')
-    xacro_file = os.path.join(pkg_path, 'urdf', 'robot_.urdf.xacro')
+    xacro_file = os.path.join(pkg_path, 'urdf', 'robot_.xacro')
     robot_description = xacro.process_file(xacro_file).toxml()
-
+    #"""
     # Start Gazebo with ROS interface
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -25,7 +25,7 @@ def generate_launch_description():
         ),
         launch_arguments={'verbose': 'true'}.items()
     )
-
+    #"""
     # Publish robot_description param + tf
     robot_state_publisher = Node(
         package='robot_state_publisher',
@@ -36,14 +36,14 @@ def generate_launch_description():
         }],
         output='screen'
     )
-
+    
     # Spawn the robot in Gazebo — let’s use the param instead of topic
     spawn_robot = Node(
         package='gazebo_ros', executable='spawn_entity.py',
         arguments=['-entity', 'robot', '-topic', 'robot_description'],
         output='screen'
     )
-
+    """
     # GUI for moving joints (optional)
     joint_state_gui = Node(
         package='joint_state_publisher_gui',
@@ -51,23 +51,21 @@ def generate_launch_description():
         parameters=[{'use_sim_time': use_sim_time}],
         output='screen'
     )
-
+    """
     # RViz with sim time
     rviz = Node(
         package='rviz2',
         executable='rviz2',
-        parameters=[{'use_sim_time': use_sim_time}],
+        #parameters=[{'use_sim_time': use_sim_time}],
         output='screen'
     )
 
     return LaunchDescription([
         DeclareLaunchArgument('use_sim_time', default_value='true'),
+        #joint_state_gui,
+        robot_state_publisher,
+        rviz,
         gazebo,
-        # wait a little to let Gazebo start and publish /clock first
-        TimerAction(period=3.0, actions=[
-            robot_state_publisher,
-            spawn_robot,
-            joint_state_gui,
-            rviz
-        ])
+        spawn_robot
+        
     ])
