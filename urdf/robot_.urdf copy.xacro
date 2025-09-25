@@ -70,7 +70,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file://$(find test_robot)/meshes/base_link.STL" />
+          filename="package://test_robot/meshes/base_link.STL" />
       </geometry>
       <material
         name="">
@@ -85,7 +85,7 @@
       <geometry>
       <!--
         <mesh
-          filename="file://$(find test_robot)/meshes/base_link.STL" />
+          filename="package://test_robot/meshes/base_link.STL" />
       -->
       <box
         size="${base_length} ${base_width} ${base_high}" />
@@ -125,7 +125,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file://$(find test_robot)/meshes/l_wheel.STL" />
+          filename="package://test_robot/meshes/l_wheel.STL" />
       </geometry>
       <material
         name="">
@@ -140,7 +140,7 @@
       <geometry>
       <!--
         <mesh
-          filename="file://$(find test_robot)/meshes/l_wheel.STL" />
+          filename="package://test_robot/meshes/l_wheel.STL" />
       -->
        <cylinder radius="${wheel_radius}" length ="${wheel_width}" />
       </geometry>
@@ -190,7 +190,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file://$(find test_robot)/meshes/r_wheel.STL" />
+          filename="package://test_robot/meshes/r_wheel.STL" />
       </geometry>
       <material
         name="">
@@ -205,7 +205,7 @@
       <geometry>
         <!--
         <mesh
-          filename="file://$(find test_robot)/meshes/r_wheel.STL" />
+          filename="package://test_robot/meshes/r_wheel.STL" />
         -->
         <cylinder radius="${wheel_radius}" length ="${wheel_width}" />
       </geometry>
@@ -257,7 +257,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file://$(find test_robot)/meshes/caster.STL" />
+          filename="package://test_robot/meshes/caster.STL" />
       </geometry>
       <material
         name="">
@@ -272,7 +272,7 @@
       <geometry>
         <!--
         <mesh
-          filename="file://$(find test_robot)/meshes/caster.STL" />
+          filename="package://test_robot/meshes/caster.STL" />
         -->
         <cylinder radius="0.03" length ="0.02" />
       </geometry>
@@ -320,7 +320,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file://$(find test_robot)/meshes/wc.STL" />
+          filename="package://test_robot/meshes/wc.STL" />
       </geometry>
       <material
         name="">
@@ -336,13 +336,12 @@
       
         <!--
         <mesh
-          filename="file://$(find test_robot)/meshes/wc.STL" />
+          filename="package://test_robot/meshes/wc.STL" />
         -->
         <cylinder radius="0.05" length ="0.024" />
       </geometry>
     </collision>
   </link>
-  
   <joint
     name="wc_joint"
     type="continuous">
@@ -356,8 +355,33 @@
     <axis
       xyz="0 0 1" />
   </joint>
-  
-  <xacro:include filename="gazebo_control.xacro" />
+
+
+  <gazebo>
+  <plugin name="diff_drive" filename="libgazebo_ros_diff_drive.so">
+    <!-- Wheel Information -->
+    <left_joint>lf_joint</left_joint>        <!-- left wheel joint -->
+    <right_joint>r_joint</right_joint>       <!-- right wheel joint -->
+    <wheel_separation>0.59808</wheel_separation>
+    <wheel_diameter>0.16</wheel_diameter>    <!-- 2 × wheel_radius = 0.16 -->
+    
+    <!-- Limits -->
+    <max_wheel_torque>200</max_wheel_torque>
+    <max_wheel_acceleration>10.0</max_wheel_acceleration>
+
+    <!-- Output / Frames -->
+    <odometry_frame>odom</odometry_frame>
+    <robot_base_frame>base_link</robot_base_frame>
+
+    <!-- Topics -->
+    <command_topic>cmd_vel</command_topic>
+    <odometry_topic>odom</odometry_topic>
+
+    <publish_odom>true</publish_odom>
+    <publish_odom_tf>true</publish_odom_tf>
+    <publish_wheel_tf>true</publish_wheel_tf>
+  </plugin>
+</gazebo>
 
 </robot>
   
